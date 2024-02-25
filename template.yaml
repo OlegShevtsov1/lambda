@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  reset
+
+  Sample SAM Template for reset
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+Resources:
+  reset:
+    Type: ASW::SSM:Parameters
+    Properties:
+      Type: String
+      Value: !Ref EMAIL
+      Name: EMAIL
+      Tags:
+        Environment: lambda/reset
+  reset-password:
+    Type: ASW::SSM:Parameters
+    Properties:
+      Type: String
+      Value: !Ref PASSWORD
+      Name: PASSWORD
+      Tags:
+        Environment: lambda/reset
+  reset-host:
+    Type: ASW::SSM:Parameters
+    Properties:
+      Type: String
+      Value: !Ref HOST
+      Name: HOST
+      Tags:
+        Environment: lambda/reset
+  ResetFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: reset/
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Events:
+        Reset:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /reset
+            Method: get
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  ResetApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  ResetFunction:
+    Description: "Reset Lambda Function ARN"
+    Value: !GetAtt ResetFunction.Arn
+  ResetFunctionIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt ResetFunctionRole.Arn
+
+Parameters:
+  EMAIL:
+    Type: String
+    NoEcho: true
+    Default: 
+  PASSWORD:
+    Type: String
+    NoEcho: true
+    Default:
+  HOST:
+    Type: String
+    NoEcho: false
+    Default:
